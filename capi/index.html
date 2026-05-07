@@ -13,7 +13,7 @@ const state = params.get("state");
 
 // przekierowanie do Cloudflare Worker
 const target =
-  "https://elite-oauth.edcolonycommoditiestracker.workers.dev/capi"
+  "https://elite-oauth.edcolonycommoditiestracker.workers.dev"
   + "?code=" + encodeURIComponent(code)
   + "&state=" + encodeURIComponent(state);
 
