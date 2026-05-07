@@ -1,14 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>ED-CCT Dashboard</title>
+  <meta charset="UTF-8">
+  <title>ED-CCT v1</title>
 </head>
 <body>
 
-<h1>ED-CCT Dashboard</h1>
+<h2>ED Colony Commodities Tracker</h2>
 
-<p>Loading user data...</p>
+<pre id="out">Loading...</pre>
+
+<script>
+const API = "https://elite-oauth.edcolonycommoditiestracker.workers.dev";
+
+const params = new URLSearchParams(location.search);
+const user = params.get("user");
+
+if (!user) {
+  document.getElementById("out").innerText =
+    "No user session. Please login via Frontier.";
+} else {
+  load();
+}
+
+async function load() {
+  try {
+    const res = await fetch(`${API}/get-token?user=${user}`);
+    const data = await res.json();
+
+    // UWAGA: to jeszcze debug (pokazuje tokeny)
+    // później tego NIE rób w produkcji
+
+    document.getElementById("out").innerText =
+      JSON.stringify(data, null, 2);
+
+  } catch (e) {
+    document.getElementById("out").innerText =
+      "Error loading data";
+  }
+}
+</script>
 
 </body>
 </html>
