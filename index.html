@@ -94,5 +94,95 @@
     </footer>
   </div>
 
+
+<div class="box">
+
+<h1>Elite Dangerous OAuth</h1>
+
+<button id="loginBtn">
+    Login Frontier
+</button>
+
+<pre id="result">
+Brak danych.
+</pre>
+
+</div>
+
+<script>
+    const CLIENT_ID = "TU_WKLEJ_CLIENT_ID";
+    
+    const REDIRECT_URI =
+        "https://ed-cct.github.io/V1/";
+    
+    const AUTH_URL =
+        "https://auth.frontierstore.net/auth";
+    
+    function generateState(length = 32){
+    
+        const chars =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    
+        let result = "";
+    
+        for(let i = 0; i < length; i++){
+            result += chars.charAt(
+                Math.floor(Math.random() * chars.length)
+            );
+        }
+    
+        return result;
+    }
+    
+    document
+    .getElementById("loginBtn")
+    .addEventListener("click", () => {
+    
+        const state = generateState();
+    
+        localStorage.setItem("oauth_state", state);
+    
+        const url =
+            AUTH_URL +
+            "?response_type=code" +
+            "&client_id=" + encodeURIComponent(CLIENT_ID) +
+            "&redirect_uri=" +
+            encodeURIComponent(REDIRECT_URI) +
+            "&scope=auth capi" +
+            "&state=" + encodeURIComponent(state);
+    
+        window.location.href = url;
+    });
+    
+    const params =
+        new URLSearchParams(window.location.search);
+    
+    const code = params.get("code");
+    const state = params.get("state");
+    
+    const savedState =
+        localStorage.getItem("oauth_state");
+    
+    if(code){
+    
+        if(state !== savedState){
+    
+            document.getElementById("result")
+            .textContent =
+                "Błąd STATE.";
+    
+        }else{
+    
+            document.getElementById("result")
+            .textContent =
+    `Kod OAuth:
+    
+    ${code}
+    
+    To jeszcze NIE jest access token.
+    `;
+        }
+    }
+    </script>
 </body>
 </html>
