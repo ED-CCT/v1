@@ -2,34 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ED-CCT v1</title>
+  <title>ED-CCT Data</title>
 </head>
 <body>
 
-<h2>ED Colony Commodities Tracker</h2>
+<h2>ED-CCT Data</h2>
 
 <pre id="out">Loading...</pre>
 
 <script>
-const API = "https://elite-oauth.edcolonycommoditiestracker.workers.dev";
+const API =
+  "https://elite-oauth.edcolonycommoditiestracker.workers.dev";
 
-const params = new URLSearchParams(location.search);
-const user = params.get("user");
+const session =
+  new URLSearchParams(location.search).get("session");
 
-if (!user) {
+if (!session) {
   document.getElementById("out").innerText =
-    "No user session. Please login via Frontier.";
+    "No session. Please login again.";
 } else {
   load();
 }
 
 async function load() {
   try {
-    const res = await fetch(`${API}/get-token?user=${user}`);
-    const data = await res.json();
+    const res = await fetch(
+      `${API}/data?session=${session}`
+    );
 
-    // UWAGA: to jeszcze debug (pokazuje tokeny)
-    // później tego NIE rób w produkcji
+    const data = await res.json();
 
     document.getElementById("out").innerText =
       JSON.stringify(data, null, 2);
