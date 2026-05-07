@@ -2,22 +2,13 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Redirecting...</title>
+  <title>ED-CCT Dashboard</title>
 </head>
 <body>
-<script>
-const params = new URLSearchParams(window.location.search);
 
-const code = params.get("code");
-const state = params.get("state");
+<h1>ED-CCT Dashboard</h1>
 
-// przekierowanie do Cloudflare Worker
-const target =
-  "https://elite-oauth.edcolonycommoditiestracker.workers.dev"
-  + "?code=" + encodeURIComponent(code)
-  + "&state=" + encodeURIComponent(state);
+<p>Loading user data...</p>
 
-window.location.href = target;
-</script>
 </body>
 </html>
