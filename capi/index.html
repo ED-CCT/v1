@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+</head>
+<body>
+<script>
+const params = new URLSearchParams(window.location.search);
+
+const code = params.get("code");
+const state = params.get("state");
+
+// przekierowanie do Cloudflare Worker
+const target =
+  "https://elite-oauth.edcolonycommoditiestracker.workers.dev/capi"
+  + "?code=" + encodeURIComponent(code)
+  + "&state=" + encodeURIComponent(state);
+
+window.location.href = target;
+</script>
+</body>
+</html>
