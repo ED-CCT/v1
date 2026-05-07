@@ -98,47 +98,16 @@
   </div>
 
 
-
 <script>
-function base64url(buffer) {
-  return btoa(String.fromCharCode(...new Uint8Array(buffer)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
-
-function randomString(length = 64) {
-  const arr = new Uint8Array(length);
-  crypto.getRandomValues(arr);
-  return Array.from(arr, b => ("0" + b.toString(16)).slice(-2)).join("");
-}
-
-async function sha256(str) {
-  const data = new TextEncoder().encode(str);
-  const hash = await crypto.subtle.digest("SHA-256", data);
-  return base64url(hash);
-}
-
-async function login() {
+function login() {
   const clientId = "25bf7a3c-cee8-4b93-b42f-cb2137a7d110";
-
-  const verifier = randomString(64);
-  sessionStorage.setItem("pkce_verifier", verifier);
-
-  const challenge = await sha256(verifier);
-
-  const redirectUri =
-    "https://elite-oauth.edcolonycommoditiestracker.workers.dev/callback";
+  const redirectUri = "https://elite-oauth.edcolonycommoditiestracker.workers.dev/callback";
 
   const url =
     "https://auth.frontierstore.net/auth" +
     "?response_type=code" +
     "&client_id=" + clientId +
-    "&redirect_uri=" + encodeURIComponent(redirectUri) +
-    "&scope=auth%20capi" +
-    "&audience=all" +
-    "&code_challenge=" + challenge +
-    "&code_challenge_method=S256";
+    "&redirect_uri=" + encodeURIComponent(redirectUri);
 
   window.location.href = url;
 }
