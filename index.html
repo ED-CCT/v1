@@ -95,7 +95,7 @@
   </div>
 
 
- <button onclick="login()">Login Frontier</button>
+<button onclick="login()">Login Frontier</button>
 
 <script>
 function base64url(buffer) {
@@ -105,28 +105,28 @@ function base64url(buffer) {
     .replace(/=+$/, "");
 }
 
-// generate random string
 function randomString(length = 64) {
   const array = new Uint8Array(length);
   crypto.getRandomValues(array);
-  return Array.from(array, b => ("0" + b.toString(16)).slice(-2)).join("");
+  return Array.from(array, b =>
+    ("0" + b.toString(16)).slice(-2)
+  ).join("");
 }
 
-// SHA256
 async function sha256(str) {
-  const buf = new TextEncoder().encode(str);
-  const hash = await crypto.subtle.digest("SHA-256", buf);
+  const data = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest("SHA-256", data);
   return base64url(hash);
 }
 
 async function login() {
   const clientId = "25bf7a3c-cee8-4b93-b42f-cb2137a7d110";
 
-  // 1. PKCE verifier
   const code_verifier = randomString(64);
-  localStorage.setItem("pkce_verifier", code_verifier);
 
-  // 2. challenge
+  // 🔥 WAŻNE: sessionStorage zamiast localStorage
+  sessionStorage.setItem("pkce_verifier", code_verifier);
+
   const code_challenge = await sha256(code_verifier);
 
   const redirectUri =
