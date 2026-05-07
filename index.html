@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ED-CCT</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0b0f1a;
+      color: #e6edf3;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 700px;
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      color: #ff9800;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: normal;
+      color: #9fb3c8;
+      margin-bottom: 30px;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #c7d1db;
+    }
+
+    .status {
+      margin-top: 30px;
+      padding: 15px 25px;
+      border: 1px solid #ff9800;
+      border-radius: 8px;
+      display: inline-block;
+      color: #ff9800;
+      font-weight: bold;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #6b7a8a;
+    }
+
+    a {
+      color: #ff9800;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>ED-CCT</h1>
+
+    <h2>
+      Elite Dangerous Colony Commodities Tracker
+    </h2>
+
+    <p>
+      A tool for tracking colony construction commodities,
+      logistics, and material contributions in Elite Dangerous.
+    </p>
+
+    <div class="status">
+      🚧 Application currently under development
+    </div>
+
+    <footer>
+      <p>
+        Created for the Elite Dangerous community
+      </p>
+    </footer>
+  </div>
+
+</body>
+</html>
