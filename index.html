@@ -24,19 +24,61 @@
     </div>
 
     <script>
-        function login() {
-          const clientId =
-            "25bf7a3c-cee8-4b93-b42f-cb2137a7d110";
+        const CLIENT_ID = "25bf7a3c-cee8-4b93-b42f-cb2137a7d110";
+        const REDIRECT_URI = "https://elite-oauth.edcolonycommoditiestracker.workers.dev/callback";
+        const AUTH_URL = "https://auth.frontierstore.net/auth";
         
-          const redirectUri =
-            "https://elite-oauth.edcolonycommoditiestracker.workers.dev/callback";
+        // ------------------------
+        // BASE64URL helper
+        // ------------------------
+        function base64url(buffer) {
+          return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=+$/, "");
+        }
+        
+        // ------------------------
+        // SHA256
+        // ------------------------
+        async function sha256(plain) {
+          const encoder = new TextEncoder();
+          const data = encoder.encode(plain);
+          return crypto.subtle.digest("SHA-256", data);
+        }
+        
+        // ------------------------
+        // PKCE generator
+        // ------------------------
+        function generateVerifier() {
+          const array = new Uint8Array(32);
+          crypto.getRandomValues(array);
+          return base64url(array);
+        }
+        
+        async function generateChallenge(verifier) {
+          const hashed = await sha256(verifier);
+          return base64url(hashed);
+        }
+        
+        // ------------------------
+        // LOGIN
+        // ------------------------
+        async function login() {
+        
+          const codeVerifier = generateVerifier();
+          const codeChallenge = await generateChallenge(codeVerifier);
+        
+          localStorage.setItem("pkce_verifier", codeVerifier);
         
           const url =
-            "https://auth.frontierstore.net/auth" +
+            AUTH_URL +
             "?response_type=code" +
-            "&client_id=" + clientId +
-            "&redirect_uri=" + encodeURIComponent(redirectUri) +
-            "&scope=" + encodeURIComponent("AUTH CAPI");
+            "&client_id=" + CLIENT_ID +
+            "&redirect_uri=" + encodeURIComponent(REDIRECT_URI) +
+            "&scope=" + encodeURIComponent("auth capi") +
+            "&code_challenge=" + codeChallenge +
+            "&code_challenge_method=S256";
         
           window.location.href = url;
         }
