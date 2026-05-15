@@ -30,14 +30,18 @@ async function load() {
       `${API}/data?session=${session}`
     );
 
-    const data = await res.json();
+    const text = await res.text();
+
+    console.log("STATUS:", res.status);
+    console.log("RAW RESPONSE:", text);
 
     document.getElementById("out").innerText =
-      JSON.stringify(data, null, 2);
+      text;
 
   } catch (e) {
+    console.log(e);
     document.getElementById("out").innerText =
-      "Error loading data";
+      "Fetch failed: " + e;
   }
 }
 </script>
