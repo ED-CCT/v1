@@ -11,58 +11,42 @@
 <pre id="out">Loading...</pre>
 
 <script>
+const API = "https://elite-oauth.edcolonycommoditiestracker.workers.dev";
+const out = document.getElementById("out");
 
-const API =
-  "https://elite-oauth.edcolonycommoditiestracker.workers.dev";
-
-const out =
-  document.getElementById("out");
-
-const session =
-  new URLSearchParams(location.search)
-    .get("session");
+const session = new URLSearchParams(location.search).get("session");
 
 if (!session) {
-
-  out.innerText =
-    "No session";
-
+  out.innerText = "No session";
 } else {
-
   load();
 }
 
 async function load() {
-
   try {
+    out.innerText = "Loading data...";
 
-    out.innerText =
-      "Loading data...";
-
-    const url =
-      `${API}/data?session=${session}`;
-
+    const url = `${API}/data?session=${session}`;
     console.log("FETCH:", url);
 
-    const res =
-      await fetch(url);
+    const res = await fetch(url);
 
     console.log("STATUS:", res.status);
 
-    const data =
-  await res.json();
-  
-  out.innerText = JSON.stringify( data, null, 2 );
+    const text = await res.text();
+
+    if (!res.ok) {
+      throw new Error(text);
+    }
+
+    const data = JSON.parse(text);
+    out.innerText = JSON.stringify(data, null, 2);
 
   } catch (err) {
-
     console.error(err);
-
-    out.innerText =
-      "ERROR:\n\n" + err;
+    out.innerText = "ERROR:\n\n" + err;
   }
 }
-
 </script>
 
 </body>
