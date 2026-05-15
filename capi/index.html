@@ -52,7 +52,7 @@ async function load() {
     const data =
   await res.json();
   
-  out.innerText = data;
+  out.innerText = JSON.stringify( data, null, 2 );"
 
   } catch (err) {
 
