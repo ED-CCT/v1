@@ -49,13 +49,15 @@ async function load() {
 
     console.log("STATUS:", res.status);
 
-    const text =
-      await res.text();
-
-    console.log("RAW:", text);
-
-    out.innerText =
-      text;
+    const data =
+  await res.json();
+  
+  out.innerText =
+    JSON.stringify(
+      data,
+      null,
+      2
+    );
 
   } catch (err) {
 
