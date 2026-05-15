@@ -18,14 +18,14 @@ const API =
 const out =
   document.getElementById("out");
 
-// 🔥 session z URL
 const session =
   new URLSearchParams(location.search)
     .get("session");
 
 if (!session) {
 
-  out.innerText = "No session";
+  out.innerText =
+    "No session";
 
 } else {
 
@@ -36,30 +36,30 @@ async function load() {
 
   try {
 
-    out.innerText = "Loading data...";
+    out.innerText =
+      "Loading data...";
 
     const url =
       `${API}/data?session=${session}`;
 
     console.log("FETCH:", url);
 
-    const res = await fetch(url);
+    const res =
+      await fetch(url);
 
     console.log("STATUS:", res.status);
 
-    if (!res.ok) {
-      throw new Error(await res.text());
-    }
-
-    const data = await res.json();
-
-    out.innerText = JSON.stringify(data, null, 2);
+    const data =
+  await res.json();
+  
+  out.innerText = JSON.stringify( data, null, 2 );
 
   } catch (err) {
 
     console.error(err);
 
-    out.innerText = "ERROR:\n\n" + err;
+    out.innerText =
+      "ERROR:\n\n" + err;
   }
 }
 
