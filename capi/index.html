@@ -10,7 +10,14 @@
 
 <pre id="out">Loading...</pre>
 
-<script>
+<script>c
+  onst res = await fetch(`${API}/data?session=${session}`);
+
+const text = await res.text();
+
+console.log(res.status, text);
+
+document.getElementById("out").innerText = text;
 const API =
   "https://elite-oauth.edcolonycommoditiestracker.workers.dev";
 
@@ -26,6 +33,7 @@ if (!session) {
 
 async function load() {
   try {
+
     const res = await fetch(
       `${API}/data?session=${session}`
     );
@@ -33,15 +41,17 @@ async function load() {
     const text = await res.text();
 
     console.log("STATUS:", res.status);
-    console.log("RAW RESPONSE:", text);
+    console.log("RESPONSE:", text);
 
     document.getElementById("out").innerText =
       text;
 
   } catch (e) {
+
     console.log(e);
+
     document.getElementById("out").innerText =
-      "Fetch failed: " + e;
+      "Error loading data: " + e;
   }
 }
 </script>
