@@ -10,50 +10,62 @@
 
 <pre id="out">Loading...</pre>
 
-<script>c
-  onst res = await fetch(`${API}/data?session=${session}`);
+<script>
 
-const text = await res.text();
-
-console.log(res.status, text);
-
-document.getElementById("out").innerText = text;
 const API =
   "https://elite-oauth.edcolonycommoditiestracker.workers.dev";
 
+const out =
+  document.getElementById("out");
+
 const session =
-  new URLSearchParams(location.search).get("session");
+  new URLSearchParams(location.search)
+    .get("session");
 
 if (!session) {
-  document.getElementById("out").innerText =
-    "No session. Please login again.";
+
+  out.innerText =
+    "No session";
+
 } else {
+
   load();
 }
 
 async function load() {
+
   try {
 
-    const res = await fetch(
-      `${API}/data?session=${session}`
-    );
+    out.innerText =
+      "Loading data...";
 
-    const text = await res.text();
+    const url =
+      `${API}/data?session=${session}`;
+
+    console.log("FETCH:", url);
+
+    const res =
+      await fetch(url);
 
     console.log("STATUS:", res.status);
-    console.log("RESPONSE:", text);
 
-    document.getElementById("out").innerText =
+    const text =
+      await res.text();
+
+    console.log("RAW:", text);
+
+    out.innerText =
       text;
 
-  } catch (e) {
+  } catch (err) {
 
-    console.log(e);
+    console.error(err);
 
-    document.getElementById("out").innerText =
-      "Error loading data: " + e;
+    out.innerText =
+      "ERROR:\n\n" + err;
   }
 }
+
 </script>
 
 </body>
