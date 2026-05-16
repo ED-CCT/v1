@@ -93,7 +93,7 @@ API + "/journal-debug?session=" + session
 );
 
 const text =
-await res.json();
+await res.text();
 
 status.innerText =
 "HTTP " + res.status;
