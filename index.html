@@ -18,7 +18,7 @@ min-height:100vh;
 text-align:center;
 }
 
-.container{max-width:700px;padding:40px;}
+.container{max-width:900px;padding:40px;}
 
 h1{color:#ff9800;font-size:48px;}
 h2{color:#9fb3c8;font-weight:normal;}
@@ -69,6 +69,18 @@ padding:15px;
 border-radius:8px;
 overflow:auto;
 }
+
+.flex{
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+}
+
+.half{
+flex:1;
+min-width:300px;
+text-align:left;
+}
 </style>
 </head>
 
@@ -114,12 +126,25 @@ Logout
 
 </div>
 
-<!-- PROFILE SECTION -->
+<!-- PROFILE -->
 <div id="profileBox" class="card hidden">
 
 <h3>Frontier Profile</h3>
 
+<div class="flex">
+
+<!-- RAW JSON -->
+<div class="half">
+<h4>Raw JSON</h4>
 <pre id="profileData">Loading...</pre>
+</div>
+
+<!-- UI VIEW -->
+<div class="half" id="profileUI">
+<h4>Structured View</h4>
+</div>
+
+</div>
 
 </div>
 
@@ -150,7 +175,7 @@ init();
 
 
 // =========================
-// LOAD DASHBOARD (/me)
+// DASHBOARD (/me)
 // =========================
 
 async function loadDashboard(){
@@ -164,11 +189,9 @@ const data = await res.json();
 
 if(!data.logged) return;
 
-// UI
 document.getElementById("authBox").classList.add("hidden");
 document.getElementById("dashboard").classList.remove("hidden");
 
-// fill
 document.getElementById("userEmail").innerText =
 "Logged as: " + data.email;
 
@@ -180,7 +203,7 @@ data.frontier
 
 
 // =========================
-// LOAD PROFILE (/data)
+// PROFILE (/data)
 // =========================
 
 async function loadProfile(){
@@ -192,10 +215,54 @@ if(!res.ok) return;
 
 const data = await res.json();
 
+const profile = data.profile || {};
+
 document.getElementById("profileBox").classList.remove("hidden");
 
+// RAW JSON
 document.getElementById("profileData").innerText =
-JSON.stringify(data.profile || {}, null, 2);
+JSON.stringify(profile, null, 2);
+
+// STRUCTURED UI
+document.getElementById("profileUI").innerHTML =
+renderProfile(profile);
+}
+
+
+// =========================
+// RENDER PROFILE UI
+// =========================
+
+function renderProfile(p){
+
+const commander = p.commander || {};
+const ship = p.ship || {};
+const system = p.lastSystem || {};
+
+return `
+<div>
+
+<h4>Commander</h4>
+<p><b>Name:</b> ${commander.name || "-"}</p>
+<p><b>Credits:</b> ${commander.credits || 0}</p>
+<p><b>Status:</b> ${commander.alive ? "Alive" : "Dead"}</p>
+<p><b>Docked:</b> ${commander.docked ? "Yes" : "No"}</p>
+
+<hr>
+
+<h4>Ship</h4>
+<p><b>Name:</b> ${ship.name || "-"}</p>
+<p><b>Hull:</b> ${ship.value?.hull || 0}</p>
+<p><b>Cargo:</b> ${ship.value?.cargo || 0}</p>
+<p><b>Station:</b> ${ship.station?.name || "-"}</p>
+
+<hr>
+
+<h4>System</h4>
+<p><b>Name:</b> ${system.name || "-"}</p>
+
+</div>
+`;
 }
 
 
