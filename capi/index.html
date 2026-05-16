@@ -1,52 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ED-CCT Data</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>ED Journal Debug</title>
+
+<style>
+
+body{
+background:#0b0f1a;
+color:#e6edf3;
+font-family:Arial;
+padding:30px;
+}
+
+button{
+padding:12px 18px;
+background:#ff9800;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+}
+
+pre{
+margin-top:20px;
+padding:20px;
+background:#111827;
+border-radius:12px;
+overflow:auto;
+white-space:pre-wrap;
+word-break:break-word;
+border:1px solid #253041;
+}
+
+.status{
+margin-top:15px;
+color:#ff9800;
+}
+
+</style>
 </head>
+
 <body>
 
-<h2>ED-CCT Data</h2>
+<h1>ED Journal Debug</h1>
 
-<pre id="out">Loading...</pre>
+<button onclick="testJournal()">
+Test Journal Endpoint
+</button>
+
+<div class="status" id="status"></div>
+
+<pre id="out">Waiting...</pre>
 
 <script>
-const API = "https://elite-oauth.edcolonycommoditiestracker.workers.dev";
-const out = document.getElementById("out");
 
-const session = new URLSearchParams(location.search).get("session");
+const API =
+"https://elite-oauth.edcolonycommoditiestracker.workers.dev";
 
-if (!session) {
-  out.innerText = "No session";
-} else {
-  load();
+async function testJournal(){
+
+const out =
+document.getElementById("out");
+
+const status =
+document.getElementById("status");
+
+const session =
+sessionStorage.getItem("auth_session");
+
+if(!session){
+
+status.innerText =
+"No auth_session in sessionStorage";
+
+return;
 }
 
-async function load() {
-  try {
-    out.innerText = "Loading data...";
+status.innerText =
+"Loading...";
 
-    const url = `${API}/data?session=${session}`;
-    console.log("FETCH:", url);
+out.innerText =
+"Fetching...";
 
-    const res = await fetch(url);
+try{
 
-    console.log("STATUS:", res.status);
+const res =
+await fetch(
+API + "/journal-debug?session=" + session
+);
 
-    const text = await res.text();
+const text =
+await res.text();
 
-    if (!res.ok) {
-      throw new Error(text);
-    }
+status.innerText =
+"HTTP " + res.status;
 
-    const data = JSON.parse(text);
-    out.innerText = JSON.stringify(data, null, 2);
+out.innerText = text;
 
-  } catch (err) {
-    console.error(err);
-    out.innerText = "ERROR:\n\n" + err;
-  }
+}catch(err){
+
+status.innerText =
+"Fetch failed";
+
+out.innerText =
+String(err);
+
 }
+
+}
+
 </script>
 
 </body>
