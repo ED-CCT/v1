@@ -297,13 +297,46 @@ cargo.map(c => `
 const services =
 f?.market?.services || {};
 
+const selectedServices = {
+
+carrierfuel:
+"Carrier Fuel",
+
+shipyard:
+"Shipyard",
+
+outfitting:
+"Outfitting",
+
+refuel:
+"Refuel",
+
+repair:
+"Repair",
+
+rearm:
+"Rearm"
+
+};
+
 const servicesHtml =
-Object.entries(services)
-.map(([k,v]) => `
+Object.entries(selectedServices)
+.map(([key,label]) => {
+
+const value =
+services[key];
+
+if(value === undefined)
+return "";
+
+return `
 <p>
-<b>${k}:</b> ${v}
+<b>${label}:</b> ${value}
 </p>
-`).join("");
+`;
+
+})
+.join("");
 
 return `
 
