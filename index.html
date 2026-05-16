@@ -145,8 +145,12 @@ Logout
 <div class="half">
 <h4>Raw JSON</h4>
 <pre id="profileData">Loading...</pre>
-<pre id="carierData">Loading...</pre>
+<pre id="shipyardData">Loading...</pre>
+<pre id="marketData">Loading...</pre>
 <pre id="journalData">Loading...</pre>
+<pre id="fleetcarrierData">Loading...</pre>
+<pre id="squadronData">Loading...</pre>
+<pre id="communitygoalsData">Loading...</pre>
 </div>
 
 <!-- UI -->
@@ -227,18 +231,30 @@ if(!res.ok) return;
 const data = await res.json();
 
 const p = data.profile || {};
+const s = data.shipyard || {};
 const m = data.market || {};
 const j = data.journal || {};
+const f = data.fleetcarrier || {};
+const q = data.squadron || {};
+const c = data.communitygoals || {};
 
 document.getElementById("profileBox").classList.remove("hidden");
 
 // RAW JSON
 document.getElementById("profileData").innerText =
 JSON.stringify(p, null, 2);
-document.getElementById("carierData").innerText =
+document.getElementById("shipyardData").innerText =
+JSON.stringify(s, null, 2);
+document.getElementById("marketData").innerText =
 JSON.stringify(m, null, 2);
 document.getElementById("journalData").innerText =
 JSON.stringify(j, null, 2);
+document.getElementById("fleetcarrierData").innerText =
+JSON.stringify(f, null, 2);
+document.getElementById("squadronData").innerText =
+JSON.stringify(q, null, 2);
+document.getElementById("communitygoals").innerText =
+JSON.stringify(c, null, 2);
 
 // UI
 document.getElementById("profileUI").innerHTML =
