@@ -145,7 +145,6 @@ Logout
 <div class="half">
 <h4>Raw JSON</h4>
 <pre id="journalData">Loading...</pre>
-<pre id="fleetcarrierData">Loading...</pre>
 </div>
 
 <!-- UI -->
@@ -234,9 +233,6 @@ document.getElementById("profileBox")
 // RAW JSON
 document.getElementById("journalData").innerText =
 JSON.stringify(j, null, 2);
-
-document.getElementById("fleetcarrierData").innerText =
-JSON.stringify(f, null, 2);
 
 // UI
 document.getElementById("profileUI").innerHTML =
