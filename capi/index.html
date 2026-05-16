@@ -99,7 +99,7 @@ JSON.stringify(data.events, null, 2);
 status.innerText =
 "HTTP " + res.status;
 
-out.innerText = data;
+out.innerText = JSON.stringify(data, null, 2);
 
 }catch(err){
 
