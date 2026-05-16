@@ -2,140 +2,439 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ED-CCT</title>
-    <style>
-        body { margin: 0; padding: 0; background: #0b0f1a; color: #e6edf3; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; } .container { max-width: 700px; padding: 40px; } h1 { font-size: 48px; margin-bottom: 10px; color: #ff9800; } h2 { font-size: 22px; font-weight: normal; color: #9fb3c8; margin-bottom: 30px; } p { font-size: 18px; line-height: 1.6; color: #c7d1db; } .status { margin-top: 30px; padding: 15px 25px; border: 1px solid #ff9800; border-radius: 8px; display: inline-block; color: #ff9800; background: #0b0f1a; font-weight: bold; } footer { margin-top: 40px; font-size: 14px; color: #6b7a8a; } a { color: #ff9800; text-decoration: none; } a:hover { text-decoration: underline; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>ED-CCT</title>
+
+<style>
+
+body{
+    margin:0;
+    padding:0;
+    background:#0b0f1a;
+    color:#e6edf3;
+    font-family:Arial,sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    text-align:center;
+}
+
+.container{
+    max-width:700px;
+    padding:40px;
+}
+
+h1{
+    font-size:48px;
+    margin-bottom:10px;
+    color:#ff9800;
+}
+
+h2{
+    font-size:22px;
+    font-weight:normal;
+    color:#9fb3c8;
+    margin-bottom:30px;
+}
+
+p{
+    font-size:18px;
+    line-height:1.6;
+    color:#c7d1db;
+}
+
+.card{
+    margin-top:30px;
+    padding:25px;
+    border:1px solid #253041;
+    border-radius:12px;
+    background:#111827;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    margin-top:12px;
+    border-radius:8px;
+    border:none;
+    outline:none;
+    background:#1b2535;
+    color:white;
+    box-sizing:border-box;
+    font-size:16px;
+}
+
+button{
+    margin-top:18px;
+    padding:14px 22px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#ff9800;
+    color:black;
+    font-weight:bold;
+    font-size:16px;
+}
+
+button:hover{
+    opacity:.9;
+}
+
+.secondary{
+    background:#253041;
+    color:white;
+}
+
+.hidden{
+    display:none;
+}
+
+.status{
+    margin-top:20px;
+    color:#ff9800;
+}
+
+footer{
+    margin-top:40px;
+    font-size:14px;
+    color:#6b7a8a;
+}
+
+</style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>ED-CCT</h1>
-        <h2> Elite Dangerous Colony Commodities Tracker </h2>
-        <p> A tool for tracking colony construction commodities, logistics, and material contributions in Elite Dangerous. </p>
-        <div class="status"> 🚧 Application currently under development </div>
-        <br>
-        <button class="status" onclick="login()">Login Frontier</button>
-        <footer>
-            <p> Created for the Elite Dangerous community <3</p>
-        </footer>
-    </div>
 
-   
+<div class="container">
+
+<h1>ED-CCT</h1>
+
+<h2>
+Elite Dangerous Colony Commodities Tracker
+</h2>
+
+<p>
+A tool for tracking colony construction
+commodities, logistics, and material
+contributions in Elite Dangerous.
+</p>
+
+<!-- ========================= -->
+<!-- AUTH -->
+<!-- ========================= -->
+
+<div id="authBox" class="card">
+
+<h3>Login / Registration</h3>
+
+<input
+    id="email"
+    type="email"
+    placeholder="Email"
+/>
+
+<input
+    id="password"
+    type="password"
+    placeholder="Password"
+/>
+
+<button onclick="register()">
+Register
+</button>
+
+<button
+    class="secondary"
+    onclick="login()"
+>
+Login
+</button>
+
+<div id="authStatus" class="status"></div>
+
+</div>
+
+<!-- ========================= -->
+<!-- APP -->
+<!-- ========================= -->
+
+<div
+    id="appBox"
+    class="card hidden"
+>
+
+<h3>
+Welcome Commander
+</h3>
+
+<p>
+Your account is logged in.
+</p>
+
+<button onclick="connectFrontier()">
+Connect Frontier Account
+</button>
+
+<br>
+
+<button
+    class="secondary"
+    onclick="logout()"
+>
+Logout
+</button>
+
+<div id="appStatus" class="status"></div>
+
+</div>
+
+<footer>
+Created for the Elite Dangerous community
+</footer>
+
+</div>
 
 <script>
 
+const API =
+"https://elite-oauth.edcolonycommoditiestracker.workers.dev";
+
+// =========================
+// SESSION CHECK
+// =========================
+
+const authSession =
+sessionStorage.getItem(
+    "auth_session"
+);
+
+if (authSession) {
+
+    showApp();
+
+}
+
+// =========================
+// REGISTER
+// =========================
+
+async function register() {
+
+    const email =
+    document
+        .getElementById("email")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const password =
+    document
+        .getElementById("password")
+        .value;
+
+    const status =
+    document.getElementById(
+        "authStatus"
+    );
+
+    status.innerText =
+    "Creating account...";
+
+    try {
+
+        const res =
+        await fetch(
+            API + "/register",
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+
+                body:JSON.stringify({
+                    email,
+                    password
+                })
+            }
+        );
+
+        const data =
+        await res.json();
+
+        if (!res.ok) {
+            throw new Error(
+                data.error || "Register failed"
+            );
+        }
+
+        status.innerText =
+        "Account created";
+
+    } catch(err) {
+
+        status.innerText =
+        err.message;
+    }
+}
+
+// =========================
+// LOGIN
+// =========================
+
 async function login() {
 
-  const clientId =
-    "25bf7a3c-cee8-4b93-b42f-cb2137a7d110";
+    const email =
+    document
+        .getElementById("email")
+        .value
+        .trim()
+        .toLowerCase();
 
-  const redirectUri =
-    "https://elite-oauth.edcolonycommoditiestracker.workers.dev/callback";
+    const password =
+    document
+        .getElementById("password")
+        .value;
 
-  // =========================
-  // PKCE
-  // =========================
-
-  const codeVerifier =
-    generateRandomString(64);
-
-  const codeChallenge =
-    await pkceChallengeFromVerifier(
-      codeVerifier
+    const status =
+    document.getElementById(
+        "authStatus"
     );
 
-  // =========================
-  // AUTH URL
-  // =========================
+    status.innerText =
+    "Logging in...";
 
-  const authUrl =
+    try {
 
-    "https://auth.frontierstore.net/auth" +
+        const res =
+        await fetch(
+            API + "/login",
+            {
+                method:"POST",
 
-    "?response_type=code" +
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
 
-    "&client_id=" +
-    encodeURIComponent(clientId) +
+                body:JSON.stringify({
+                    email,
+                    password
+                })
+            }
+        );
 
-    "&redirect_uri=" +
-    encodeURIComponent(redirectUri) +
+        const data =
+        await res.json();
 
-    "&scope=auth%20capi" +
+        if (!res.ok) {
+            throw new Error(
+                data.error || "Login failed"
+            );
+        }
 
-    "&code_challenge=" +
-    encodeURIComponent(codeChallenge) +
+        sessionStorage.setItem(
+            "auth_session",
+            data.session
+        );
 
-    "&code_challenge_method=S256" +
+        showApp();
 
-    "&state=" +
-    encodeURIComponent(codeVerifier);
+    } catch(err) {
 
-  // =========================
-  // REDIRECT
-  // =========================
-
-  window.location.href =
-    authUrl;
+        status.innerText =
+        err.message;
+    }
 }
 
 // =========================
-// HELPERS
+// SHOW APP
 // =========================
 
-function generateRandomString(length) {
+function showApp() {
 
-  const chars =
+    document
+        .getElementById("authBox")
+        .classList
+        .add("hidden");
 
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-    "abcdefghijklmnopqrstuvwxyz" +
-    "0123456789";
-
-  let result = "";
-
-  for (let i = 0; i < length; i++) {
-
-    result += chars.charAt(
-      Math.floor(
-        Math.random() *
-        chars.length
-      )
-    );
-  }
-
-  return result;
+    document
+        .getElementById("appBox")
+        .classList
+        .remove("hidden");
 }
 
-async function pkceChallengeFromVerifier(
-  verifier
-) {
+// =========================
+// LOGOUT
+// =========================
 
-  const data =
-    new TextEncoder()
-      .encode(verifier);
+function logout() {
 
-  const digest =
-    await crypto.subtle.digest(
-      "SHA-256",
-      data
+    sessionStorage.removeItem(
+        "auth_session"
     );
 
-  return btoa(
+    location.reload();
+}
 
-    String.fromCharCode(
-      ...new Uint8Array(digest)
-    )
+// =========================
+// FRONTIER LOGIN
+// =========================
 
-  )
-  .replace(/\+/g, "-")
-  .replace(/\//g, "_")
-  .replace(/=+$/, "");
+async function connectFrontier() {
+
+    const authSession =
+    sessionStorage.getItem(
+        "auth_session"
+    );
+
+    const appStatus =
+    document.getElementById(
+        "appStatus"
+    );
+
+    appStatus.innerText =
+    "Preparing Frontier login...";
+
+    try {
+
+        const res =
+        await fetch(
+            API + "/frontier/start",
+            {
+                headers:{
+                    Authorization:
+                    "Bearer " +
+                    authSession
+                }
+            }
+        );
+
+        const data =
+        await res.json();
+
+        if (!res.ok) {
+            throw new Error(
+                data.error ||
+                "OAuth start failed"
+            );
+        }
+
+        location.href =
+        data.url;
+
+    } catch(err) {
+
+        appStatus.innerText =
+        err.message;
+    }
 }
 
 </script>
 
 </body>
-
 </html>
