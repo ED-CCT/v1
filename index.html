@@ -232,11 +232,8 @@ const data = await res.json();
 
 const p = data.profile || {};
 const m = data.market || {};
-const s = data.shipyard || {};
 const j = data.journal || {};
 const f = data.fleetcarrier || {};
-const q = data.squadron || {};
-const c = data.communitygoals || {};
 
 document.getElementById("profileBox").classList.remove("hidden");
 
@@ -245,16 +242,10 @@ document.getElementById("profileData").innerText =
 JSON.stringify(p, null, 2);
 document.getElementById("marketData").innerText =
 JSON.stringify(m, null, 2);
-document.getElementById("shipyardData").innerText =
-JSON.stringify(s, null, 2);
 document.getElementById("journalData").innerText =
 JSON.stringify(j, null, 2);
 document.getElementById("fleetcarrierData").innerText =
 JSON.stringify(f, null, 2);
-document.getElementById("squadronData").innerText =
-JSON.stringify(q, null, 2);
-document.getElementById("communitygoalsData").innerText =
-JSON.stringify(c, null, 2);
 
 // UI
 document.getElementById("profileUI").innerHTML =
