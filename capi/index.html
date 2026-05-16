@@ -92,10 +92,10 @@ await fetch(
 API + "/journal-debug?session=" + session
 );
 
-const text =
-await res.json();
+const data = await res.json();
+
 document.getElementById("out").innerText =
-JSON.stringify(res, null, 2);
+JSON.stringify(data.events, null, 2);
 status.innerText =
 "HTTP " + res.status;
 
