@@ -56,6 +56,11 @@ font-weight:bold;
 .hidden{display:none;}
 
 .status{margin-top:15px;color:#ff9800;}
+
+.small{
+color:#9fb3c8;
+font-size:14px;
+}
 </style>
 </head>
 
@@ -80,15 +85,26 @@ font-weight:bold;
 <div id="authStatus" class="status"></div>
 </div>
 
-<!-- APP -->
-<div id="appBox" class="card hidden">
+<!-- DASHBOARD -->
+<div id="dashboard" class="card hidden">
 
-<h3>Commander Panel</h3>
+<h3>Commander Dashboard</h3>
 
-<button onclick="connectFrontier()">Connect Frontier</button>
-<button class="secondary" onclick="logout()">Logout</button>
+<p id="userEmail" class="small"></p>
 
-<div id="appStatus" class="status"></div>
+<p id="frontierStatus">Checking Frontier...</p>
+
+<button onclick="connectFrontier()">
+Connect Frontier
+</button>
+
+<br/>
+
+<button class="secondary" onclick="logout()">
+Logout
+</button>
+
+<div id="dashStatus" class="status"></div>
 
 </div>
 
@@ -99,17 +115,28 @@ font-weight:bold;
 const API =
 "https://elite-oauth.edcolonycommoditiestracker.workers.dev";
 
+let session = null;
 
 // =========================
-// SESSION CHECK (FIXED)
+// INIT
 // =========================
 
-async function checkLogin(){
+async function init(){
 
-const session =
-sessionStorage.getItem("auth_session");
+session = sessionStorage.getItem("auth_session");
 
 if(!session) return;
+
+await loadDashboard();
+}
+
+init();
+
+// =========================
+// LOAD DASHBOARD
+// =========================
+
+async function loadDashboard(){
 
 const res =
 await fetch(API + "/me?session=" + session);
@@ -118,13 +145,21 @@ if(!res.ok) return;
 
 const data = await res.json();
 
-if(data.logged){
-showApp();
-}
-}
+if(!data.logged) return;
 
-checkLogin();
+// switch UI
+document.getElementById("authBox").classList.add("hidden");
+document.getElementById("dashboard").classList.remove("hidden");
 
+// fill data
+document.getElementById("userEmail").innerText =
+"Logged as: " + data.email;
+
+document.getElementById("frontierStatus").innerText =
+data.frontier
+? "Frontier: CONNECTED ✔"
+: "Frontier: NOT CONNECTED ✖";
+}
 
 // =========================
 // REGISTER
@@ -151,23 +186,15 @@ body:JSON.stringify({email,password})
 
 const data = await res.json();
 
-if(data.error){
-status.innerText = data.error;
-return;
+status.innerText =
+data.error || "Account created ✔";
 }
-
-status.innerText = "Account created ✔";
-}
-
 
 // =========================
-// LOGIN (FIXED + SAFE)
+// LOGIN
 // =========================
 
 async function login(){
-
-const buttons = document.querySelectorAll("button");
-buttons.forEach(b => b.disabled = true);
 
 const email =
 document.getElementById("email").value.trim().toLowerCase();
@@ -179,8 +206,6 @@ const status =
 document.getElementById("authStatus");
 
 status.innerText = "Logging in...";
-
-try{
 
 const res = await fetch(API + "/login",{
 method:"POST",
@@ -195,43 +220,18 @@ status.innerText = data.error;
 return;
 }
 
-if(data.session){
 sessionStorage.setItem("auth_session",data.session);
-showApp();
-return;
+
+session = data.session;
+
+await loadDashboard();
 }
-
-status.innerText = "Login failed";
-
-} finally {
-buttons.forEach(b => b.disabled = false);
-}
-}
-
-
-// =========================
-// UI SWITCH
-// =========================
-
-function showApp(){
-document.getElementById("authBox").classList.add("hidden");
-document.getElementById("appBox").classList.remove("hidden");
-}
-
-function logout(){
-sessionStorage.removeItem("auth_session");
-location.reload();
-}
-
 
 // =========================
 // FRONTIER CONNECT
 // =========================
 
 async function connectFrontier(){
-
-const session =
-sessionStorage.getItem("auth_session");
 
 const res = await fetch(API + "/frontier/start",{
 headers:{
@@ -242,13 +242,21 @@ Authorization:"Bearer " + session
 const data = await res.json();
 
 if(data.error){
-document.getElementById("appStatus").innerText = data.error;
+document.getElementById("dashStatus").innerText = data.error;
 return;
 }
 
-if(data.url){
 location.href = data.url;
 }
+
+// =========================
+// LOGOUT
+// =========================
+
+function logout(){
+
+sessionStorage.removeItem("auth_session");
+location.reload();
 }
 
 </script>
