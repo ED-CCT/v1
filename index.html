@@ -146,6 +146,7 @@ Logout
 <h4>Raw JSON</h4>
 <pre id="profileData">Loading...</pre>
 <pre id="carierData">Loading...</pre>
+<pre id="journalData">Loading...</pre>
 </div>
 
 <!-- UI -->
@@ -227,6 +228,7 @@ const data = await res.json();
 
 const p = data.profile || {};
 const m = data.market || {};
+const j = data.journal || {};
 
 document.getElementById("profileBox").classList.remove("hidden");
 
@@ -235,6 +237,8 @@ document.getElementById("profileData").innerText =
 JSON.stringify(p, null, 2);
 document.getElementById("carierData").innerText =
 JSON.stringify(m, null, 2);
+document.getElementById("journalData").innerText =
+JSON.stringify(j, null, 2);
 
 // UI
 document.getElementById("profileUI").innerHTML =
