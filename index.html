@@ -145,6 +145,7 @@ Logout
 <div class="half">
 <h4>Raw JSON</h4>
 <pre id="profileData">Loading...</pre>
+<pre id="carierData">Loading...</pre>
 </div>
 
 <!-- UI -->
@@ -225,11 +226,14 @@ if(!res.ok) return;
 const data = await res.json();
 
 const p = data.profile || {};
+const m = data.market || {};
 
 document.getElementById("profileBox").classList.remove("hidden");
 
 // RAW JSON
 document.getElementById("profileData").innerText =
+JSON.stringify(p, null, 2);
+document.getElementById("carierData").innerText =
 JSON.stringify(p, null, 2);
 
 // UI
