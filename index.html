@@ -144,8 +144,6 @@ Logout
 <!-- RAW -->
 <div class="half">
 <h4>Raw JSON</h4>
-<pre id="profileData">Loading...</pre>
-<pre id="marketData">Loading...</pre>
 <pre id="journalData">Loading...</pre>
 <pre id="fleetcarrierData">Loading...</pre>
 </div>
@@ -227,18 +225,12 @@ if(!res.ok) return;
 
 const data = await res.json();
 
-const p = data.profile || {};
-const m = data.market || {};
 const j = data.journal || {};
 const f = data.fleetcarrier || {};
 
 document.getElementById("profileBox").classList.remove("hidden");
 
-// RAW JSON
-document.getElementById("profileData").innerText =
-JSON.stringify(p, null, 2);
-document.getElementById("marketData").innerText =
-JSON.stringify(m, null, 2);
+// RAW JSONketData").innerText =
 document.getElementById("journalData").innerText =
 JSON.stringify(j, null, 2);
 document.getElementById("fleetcarrierData").innerText =
