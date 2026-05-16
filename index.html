@@ -1,108 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ED-CCT</title>
 
 <style>
-
 body{
-    margin:0;
-    padding:0;
-    background:#0b0f1a;
-    color:#e6edf3;
-    font-family:Arial,sans-serif;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    text-align:center;
+margin:0;
+background:#0b0f1a;
+color:#e6edf3;
+font-family:Arial;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+text-align:center;
 }
 
-.container{
-    max-width:700px;
-    padding:40px;
-}
+.container{max-width:700px;padding:40px;}
 
-h1{
-    font-size:48px;
-    margin-bottom:10px;
-    color:#ff9800;
-}
-
-h2{
-    font-size:22px;
-    font-weight:normal;
-    color:#9fb3c8;
-    margin-bottom:30px;
-}
-
-p{
-    font-size:18px;
-    line-height:1.6;
-    color:#c7d1db;
-}
+h1{color:#ff9800;font-size:48px;}
+h2{color:#9fb3c8;font-weight:normal;}
 
 .card{
-    margin-top:30px;
-    padding:25px;
-    border:1px solid #253041;
-    border-radius:12px;
-    background:#111827;
+margin-top:25px;
+padding:25px;
+border:1px solid #253041;
+border-radius:12px;
+background:#111827;
 }
 
 input{
-    width:100%;
-    padding:14px;
-    margin-top:12px;
-    border-radius:8px;
-    border:none;
-    outline:none;
-    background:#1b2535;
-    color:white;
-    box-sizing:border-box;
-    font-size:16px;
+width:100%;
+padding:12px;
+margin-top:10px;
+background:#1b2535;
+border:none;
+color:white;
+border-radius:8px;
 }
 
 button{
-    margin-top:18px;
-    padding:14px 22px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    background:#ff9800;
-    color:black;
-    font-weight:bold;
-    font-size:16px;
+margin-top:15px;
+padding:12px 18px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#ff9800;
+font-weight:bold;
 }
 
-button:hover{
-    opacity:.9;
-}
+.secondary{background:#253041;color:white;}
 
-.secondary{
-    background:#253041;
-    color:white;
-}
+.hidden{display:none;}
 
-.hidden{
-    display:none;
-}
-
-.status{
-    margin-top:20px;
-    color:#ff9800;
-}
-
-footer{
-    margin-top:40px;
-    font-size:14px;
-    color:#6b7a8a;
-}
-
+.status{margin-top:15px;color:#ff9800;}
 </style>
 </head>
 
@@ -111,89 +64,33 @@ footer{
 <div class="container">
 
 <h1>ED-CCT</h1>
+<h2>Elite Dangerous Tracker</h2>
 
-<h2>
-Elite Dangerous Colony Commodities Tracker
-</h2>
-
-<p>
-A tool for tracking colony construction
-commodities, logistics, and material
-contributions in Elite Dangerous.
-</p>
-
-<!-- ========================= -->
-<!-- AUTH -->
-<!-- ========================= -->
-
+<!-- LOGIN -->
 <div id="authBox" class="card">
 
-<h3>Login / Registration</h3>
+<h3>Login / Register</h3>
 
-<input
-    id="email"
-    type="email"
-    placeholder="Email"
-/>
+<input id="email" placeholder="Email"/>
+<input id="password" type="password" placeholder="Password"/>
 
-<input
-    id="password"
-    type="password"
-    placeholder="Password"
-/>
-
-<button onclick="register()">
-Register
-</button>
-
-<button
-    class="secondary"
-    onclick="login()"
->
-Login
-</button>
+<button onclick="register()">Register</button>
+<button class="secondary" onclick="login()">Login</button>
 
 <div id="authStatus" class="status"></div>
-
 </div>
 
-<!-- ========================= -->
 <!-- APP -->
-<!-- ========================= -->
+<div id="appBox" class="card hidden">
 
-<div
-    id="appBox"
-    class="card hidden"
->
+<h3>Commander Panel</h3>
 
-<h3>
-Welcome Commander
-</h3>
-
-<p>
-Your account is logged in.
-</p>
-
-<button onclick="connectFrontier()">
-Connect Frontier Account
-</button>
-
-<br>
-
-<button
-    class="secondary"
-    onclick="logout()"
->
-Logout
-</button>
+<button onclick="connectFrontier()">Connect Frontier</button>
+<button class="secondary" onclick="logout()">Logout</button>
 
 <div id="appStatus" class="status"></div>
 
 </div>
-
-<footer>
-Created for the Elite Dangerous community
-</footer>
 
 </div>
 
@@ -202,236 +99,105 @@ Created for the Elite Dangerous community
 const API =
 "https://elite-oauth.edcolonycommoditiestracker.workers.dev";
 
-// =========================
-// SESSION CHECK
-// =========================
+async function checkLogin(){
 
-const authSession =
-sessionStorage.getItem(
-    "auth_session"
-);
+const session =
+sessionStorage.getItem("auth_session");
 
-if (authSession) {
+if(!session) return;
 
-    showApp();
+const res =
+await fetch(API + "/me?session=" + session);
 
+if(!res.ok) return;
+
+const data = await res.json();
+
+if(data.logged){
+showApp();
+}
 }
 
-// =========================
-// REGISTER
-// =========================
+checkLogin();
 
-async function register() {
+// ---------------- LOGIN ----------------
 
-    const email =
-    document
-        .getElementById("email")
-        .value
-        .trim()
-        .toLowerCase();
+async function register(){
 
-    const password =
-    document
-        .getElementById("password")
-        .value;
+const email =
+document.getElementById("email").value.trim().toLowerCase();
 
-    const status =
-    document.getElementById(
-        "authStatus"
-    );
+const password =
+document.getElementById("password").value;
 
-    status.innerText =
-    "Creating account...";
+const res = await fetch(API + "/register",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({email,password})
+});
 
-    try {
+const data = await res.json();
 
-        const res =
-        await fetch(
-            API + "/register",
-            {
-                method:"POST",
-
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
-
-                body:JSON.stringify({
-                    email,
-                    password
-                })
-            }
-        );
-
-        const data =
-        await res.json();
-
-        if (!res.ok) {
-            throw new Error(
-                data.error || "Register failed"
-            );
-        }
-
-        status.innerText =
-        "Account created";
-
-    } catch(err) {
-
-        status.innerText =
-        err.message;
-    }
+document.getElementById("authStatus").innerText =
+data.error || "Account created";
 }
 
-// =========================
-// LOGIN
-// =========================
+async function login(){
 
-async function login() {
+const email =
+document.getElementById("email").value.trim().toLowerCase();
 
-    const email =
-    document
-        .getElementById("email")
-        .value
-        .trim()
-        .toLowerCase();
+const password =
+document.getElementById("password").value;
 
-    const password =
-    document
-        .getElementById("password")
-        .value;
+const res = await fetch(API + "/login",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({email,password})
+});
 
-    const status =
-    document.getElementById(
-        "authStatus"
-    );
+const data = await res.json();
 
-    status.innerText =
-    "Logging in...";
-
-    try {
-
-        const res =
-        await fetch(
-            API + "/login",
-            {
-                method:"POST",
-
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
-
-                body:JSON.stringify({
-                    email,
-                    password
-                })
-            }
-        );
-
-        const data =
-        await res.json();
-
-        if (!res.ok) {
-            throw new Error(
-                data.error || "Login failed"
-            );
-        }
-
-        sessionStorage.setItem(
-            "auth_session",
-            data.session
-        );
-
-        showApp();
-
-    } catch(err) {
-
-        status.innerText =
-        err.message;
-    }
+if(data.session){
+sessionStorage.setItem("auth_session",data.session);
+showApp();
+return;
 }
 
-// =========================
-// SHOW APP
-// =========================
-
-function showApp() {
-
-    document
-        .getElementById("authBox")
-        .classList
-        .add("hidden");
-
-    document
-        .getElementById("appBox")
-        .classList
-        .remove("hidden");
+document.getElementById("authStatus").innerText =
+data.error || "Login failed";
 }
 
-// =========================
-// LOGOUT
-// =========================
+// ---------------- UI ----------------
 
-function logout() {
-
-    sessionStorage.removeItem(
-        "auth_session"
-    );
-
-    location.reload();
+function showApp(){
+document.getElementById("authBox").classList.add("hidden");
+document.getElementById("appBox").classList.remove("hidden");
 }
 
-// =========================
-// FRONTIER LOGIN
-// =========================
+function logout(){
+sessionStorage.removeItem("auth_session");
+location.reload();
+}
 
-async function connectFrontier() {
+// ---------------- FRONTIER ----------------
 
-    const authSession =
-    sessionStorage.getItem(
-        "auth_session"
-    );
+async function connectFrontier(){
 
-    const appStatus =
-    document.getElementById(
-        "appStatus"
-    );
+const session =
+sessionStorage.getItem("auth_session");
 
-    appStatus.innerText =
-    "Preparing Frontier login...";
+const res = await fetch(API + "/frontier/start",{
+headers:{
+Authorization:"Bearer " + session
+}
+});
 
-    try {
+const data = await res.json();
 
-        const res =
-        await fetch(
-            API + "/frontier/start",
-            {
-                headers:{
-                    Authorization:
-                    "Bearer " +
-                    authSession
-                }
-            }
-        );
-
-        const data =
-        await res.json();
-
-        if (!res.ok) {
-            throw new Error(
-                data.error ||
-                "OAuth start failed"
-            );
-        }
-
-        location.href =
-        data.url;
-
-    } catch(err) {
-
-        appStatus.innerText =
-        err.message;
-    }
+if(data.url){
+location.href = data.url;
+}
 }
 
 </script>
