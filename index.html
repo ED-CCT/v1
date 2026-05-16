@@ -256,24 +256,38 @@ return `
 <h4>Commander</h4>
 <p><b>Name:</b> ${commander.name ?? "-"}</p>
 <p><b>Credits:</b> ${commander.credits ?? 0}</p>
-<p><b>Status:</b> ${commander.alive ? "Alive" : "Unknown"}</p>
-<p><b>Docked:</b> ${commander.docked ? "Yes" : "No"}</p>
+<p><b>Alive:</b> ${commander.alive ?? false}</p>
+<p><b>Docked:</b> ${commander.docked ?? false}</p>
 </div>
 
 <div class="box">
 <h4>Ship</h4>
+<p><b>ID:</b> ${ship.id ?? "-"}</p>
 <p><b>Name:</b> ${ship.name ?? "-"}</p>
+<p><b>Free:</b> ${ship.free ?? false}</p>
+<p><b>Alive:</b> ${ship.alive ?? false}</p>
+
 <p><b>Cargo:</b> ${ship.value?.cargo ?? 0}</p>
+
 <p><b>Hull:</b> ${ship.health?.hull ?? 0}</p>
 <p><b>Shield:</b> ${ship.health?.shield ?? 0}</p>
+<p><b>Shield Up:</b> ${ship.health?.shieldup ?? false}</p>
+
+<p><b>Cockpit Breached:</b> ${ship.cockpitBreached ?? false}</p>
+<p><b>Oxygen Remaining:</b> ${ship.oxygenRemaining ?? 0}</p>
+
 <p><b>Station:</b> ${ship.station?.name ?? "-"}</p>
 <p><b>System:</b> ${ship.starsystem?.name ?? "-"}</p>
+<p><small>ID: ${ship.starsystem?.systemaddress ?? "-"}</small></p>
 </div>
 
 <div class="box">
-<h4>Location</h4>
-<p><b>Last System:</b> ${system.name ?? "-"}</p>
-<p><b>Last Station:</b> ${station.name ?? "-"}</p>
+<h4>Last Known Location</h4>
+<p><b>System:</b> ${system.name ?? "-"}</p>
+<p><b>System ID:</b> ${system.id ?? "-"}</p>
+
+<p><b>Starport:</b> ${station.name ?? "-"}</p>
+<p><b>Starport ID:</b> ${station.id ?? "-"}</p>
 </div>
 
 <div class="box">
