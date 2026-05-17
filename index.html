@@ -278,138 +278,51 @@ data.frontier
 }
 
 // =========================
-// PROFILE
-// =========================
-
-async function loadProfile(){
-
-const res =
-await fetch(
-API + "/data?session=" + session
-);
-
-if(!res.ok) return;
-
-const data =
-await res.json();
-
-const j =
-data.journal || {};
-
-const f =
-data.fleetcarrier || {};
-
-document
-.getElementById("profileBox")
-.classList.remove("hidden");
-
-// RAW JSON
-document
-.getElementById("journalData")
-.innerText =
-JSON.stringify(
-{
-journal:j,
-fleetcarrier:f
-},
-null,
-2
-);
-
-// UI
-document
-.getElementById("profileUI")
-.innerHTML =
-renderProfile(j,f);
-
-}
-
-// =========================
-// HEX
-// =========================
-
-function hexToText(hex){
-
-if(!hex) return "";
-
-let str = "";
-
-for(
-let i = 0;
-i < hex.length;
-i += 2
-){
-
-const code =
-parseInt(
-hex.substr(i,2),
-16
-);
-
-if(!isNaN(code)){
-str +=
-String.fromCharCode(code);
-}
-
-}
-
-return str;
-
-}
-
-// =========================
-// LAST EVENTS
-// =========================
-
-function getLatestEvents(events){
-
-const latest = {};
-
-if(!Array.isArray(events))
-return latest;
-
-for(const ev of events){
-
-if(!ev.event)
-continue;
-
-latest[ev.event] = ev;
-
-}
-
-return latest;
-
-}
-
-// =========================
 // PROFILE RENDER
 // =========================
 
 function renderProfile(p, f){
 
-const commander =
-p.commander || {};
+const commander = p.commander || {};
+const ship = p.ship || {};
+const system = p.lastSystem || {};
+const station = p.lastStarport || {};
+const squadron = p.squadron || {};
 
-const ship =
-p.ship || {};
+// =========================
+// EVENTS
+// =========================
 
-const system =
-p.lastSystem || {};
+const events =
+Array.isArray(p.events)
+? p.events
+: Array.isArray(p)
+? p
+: [];
 
-const station =
-p.lastStarport || {};
+const lastLoadGame =
+[...events]
+.reverse()
+.find(e => e.event === "LoadGame") || {};
 
-const squadron =
-p.squadron || {};
+const lastLoadout =
+[...events]
+.reverse()
+.find(e => e.event === "Loadout") || {};
+
+const lastCargo =
+[...events]
+.reverse()
+.find(e => e.event === "Cargo") || {};
+
+// =========================
+// FLEET CARRIER
+// =========================
 
 const fcName =
 hexToText(
 f?.name?.vanityName || ""
 );
-
-// =========================
-// FC CARGO
-// =========================
 
 const cargo =
 Array.isArray(f?.cargo)
@@ -423,10 +336,6 @@ cargo.map(c => `
 <td>${c.qty ?? 0}</td>
 </tr>
 `).join("");
-
-// =========================
-// FC SERVICES
-// =========================
 
 const services =
 f?.market?.services || {};
@@ -465,8 +374,7 @@ return "";
 
 return `
 <p>
-<b>${label}:</b>
-${value}
+<b>${label}:</b> ${value}
 </p>
 `;
 
@@ -474,25 +382,7 @@ ${value}
 .join("");
 
 // =========================
-// EVENTS
-// =========================
-
-const latest =
-getLatestEvents(
-p.events || []
-);
-
-const loadGame =
-latest.LoadGame || {};
-
-const loadout =
-latest.Loadout || {};
-
-const cargoEvent =
-latest.Cargo || {};
-
-// =========================
-// RETURN HTML
+// HTML
 // =========================
 
 return `
@@ -501,180 +391,248 @@ return `
 
 <h4>Commander</h4>
 
-<p>
-<b>Name:</b>
-${commander.name ?? "-"}
-</p>
+<p><b>Name:</b> ${commander.name ?? "-"}</p>
 
-<p>
-<b>Credits:</b>
+<p><b>Credits:</b>
 ${Number(
 commander.credits || 0
 ).toLocaleString()}
 </p>
 
-<p>
-<b>Alive:</b>
+<p><b>Alive:</b>
 ${commander.alive ? "YES" : "NO"}
 </p>
 
-<p>
-<b>Docked:</b>
+<p><b>Docked:</b>
 ${commander.docked ? "YES" : "NO"}
 </p>
 
 </div>
 
+
 <div class="box">
 
 <h4>Ship</h4>
 
-<p>
-<b>ID:</b>
-${ship.id ?? "-"}
-</p>
+<p><b>ID:</b> ${ship.id ?? "-"}</p>
 
-<p>
-<b>Name:</b>
-${ship.name ?? "-"}
-</p>
+<p><b>Name:</b> ${ship.name ?? "-"}</p>
 
-<p>
-<b>Free:</b>
+<p><b>Free:</b>
 ${ship.free ? "YES" : "NO"}
 </p>
 
-<p>
-<b>Alive:</b>
+<p><b>Alive:</b>
 ${ship.alive ? "YES" : "NO"}
 </p>
 
-<p>
-<b>Cargo:</b>
+<p><b>Cargo:</b>
 ${ship.value?.cargo ?? 0}
 </p>
 
-<p>
-<b>Hull:</b>
+<p><b>Hull:</b>
 ${ship.health?.hull ?? 0}
 </p>
 
-<p>
-<b>Shield:</b>
+<p><b>Shield:</b>
 ${ship.health?.shield ?? 0}
 </p>
 
-<p>
-<b>Shield Up:</b>
+<p><b>Shield Up:</b>
 ${ship.health?.shieldup ? "YES" : "NO"}
 </p>
 
-<p>
-<b>Cockpit Breached:</b>
+<p><b>Cockpit Breached:</b>
 ${ship.cockpitBreached ? "YES" : "NO"}
 </p>
 
-<p>
-<b>Oxygen Remaining:</b>
+<p><b>Oxygen Remaining:</b>
 ${ship.oxygenRemaining ?? 0}
 </p>
 
-<p>
-<b>Station:</b>
+<p><b>Station:</b>
 ${ship.station?.name ?? "-"}
 </p>
 
-<p>
-<b>System:</b>
+<p><b>System:</b>
 ${ship.starsystem?.name ?? "-"}
 </p>
 
+<p>
+<small>
+System Address:
+${ship.starsystem?.systemaddress ?? "-"}
+</small>
+</p>
+
 </div>
+
+
+<div class="box">
+
+<h4>Latest LoadGame</h4>
+
+<p><b>Commander:</b>
+${lastLoadGame.Commander ?? "-"}
+</p>
+
+<p><b>Ship:</b>
+${lastLoadGame.Ship_Localised ?? "-"}
+</p>
+
+<p><b>Fuel:</b>
+${lastLoadGame.FuelLevel ?? 0}
+/
+${lastLoadGame.FuelCapacity ?? 0}
+</p>
+
+<p><b>Timestamp:</b>
+${lastLoadGame.timestamp ?? "-"}
+</p>
+
+</div>
+
+
+<div class="box">
+
+<h4>Latest Loadout</h4>
+
+<p><b>Ship Ident:</b>
+${lastLoadout.ShipIdent ?? "-"}
+</p>
+
+<p><b>Hull Value:</b>
+${Number(
+lastLoadout.HullValue || 0
+).toLocaleString()}
+</p>
+
+<p><b>Modules Value:</b>
+${Number(
+lastLoadout.ModulesValue || 0
+).toLocaleString()}
+</p>
+
+<p><b>Cargo Capacity:</b>
+${lastLoadout.CargoCapacity ?? 0}
+</p>
+
+<p><b>Jump Range:</b>
+${lastLoadout.MaxJumpRange ?? 0}
+</p>
+
+<p><b>Timestamp:</b>
+${lastLoadout.timestamp ?? "-"}
+</p>
+
+</div>
+
+
+<div class="box">
+
+<h4>Latest Cargo Event</h4>
+
+<p><b>Vessel:</b>
+${lastCargo.Vessel ?? "-"}
+</p>
+
+<p><b>Total Cargo:</b>
+${lastCargo.Count ?? 0}
+</p>
+
+<p><b>Timestamp:</b>
+${lastCargo.timestamp ?? "-"}
+</p>
+
+</div>
+
 
 <div class="box">
 
 <h4>Last Known Location</h4>
 
-<p>
-<b>System:</b>
+<p><b>System:</b>
 ${system.name ?? "-"}
 </p>
 
-<p>
-<b>Starport:</b>
+<p><b>System ID:</b>
+${system.id ?? "-"}
+</p>
+
+<p><b>Starport:</b>
 ${station.name ?? "-"}
 </p>
 
+<p><b>Starport ID:</b>
+${station.id ?? "-"}
+</p>
+
 </div>
+
 
 <div class="box">
 
 <h4>Squadron</h4>
 
-<p>
-<b>Name:</b>
+<p><b>Name:</b>
 ${squadron.name ?? "-"}
 </p>
 
-<p>
-<b>Tag:</b>
+<p><b>Tag:</b>
 ${squadron.tag ?? "-"}
 </p>
 
-<p>
-<b>Rank:</b>
+<p><b>Rank:</b>
 ${squadron.rank ?? "-"}
 </p>
 
 </div>
 
+
 <div class="box">
 
 <h4>Fleet Carrier</h4>
 
-<p>
-<b>Callsign:</b>
+<p><b>Callsign:</b>
 ${f?.name?.callsign ?? "-"}
 </p>
 
-<p>
-<b>Name:</b>
+<p><b>Name:</b>
 ${fcName || "-"}
 </p>
 
-<p>
-<b>System:</b>
+<p><b>System:</b>
 ${f?.currentStarSystem ?? "-"}
 </p>
 
-<p>
-<b>Balance:</b>
+<p><b>Balance:</b>
 ${Number(
 f?.balance || 0
 ).toLocaleString()}
 </p>
 
-<p>
-<b>Fuel:</b>
+<p><b>Fuel:</b>
 ${f?.fuel ?? 0}
 </p>
 
-<p>
-<b>Docking Access:</b>
+<p><b>Docking Access:</b>
 ${f?.dockingAccess ?? "-"}
 </p>
 
-<p>
-<b>Free Cargo Space:</b>
+<p><b>Notorious Access:</b>
+${f?.notoriousAccess ? "YES" : "NO"}
+</p>
+
+<p><b>Free Cargo Space:</b>
 ${f?.capacity?.freeSpace ?? 0}
 </p>
 
-<p>
-<b>Stored Cargo:</b>
+<p><b>Stored Cargo:</b>
 ${f?.capacity?.cargoNotForSale ?? 0}
 </p>
 
 </div>
+
 
 <div class="box">
 
@@ -684,15 +642,16 @@ ${servicesHtml || "<p>No services</p>"}
 
 </div>
 
+
 <div class="box">
 
 <h4>Fleet Carrier Cargo</h4>
 
-<table>
+<table style="width:100%;border-collapse:collapse;">
 
 <tr>
-<th>Commodity</th>
-<th>Qty</th>
+<th align="left">Commodity</th>
+<th align="left">Qty</th>
 </tr>
 
 ${cargoHtml || `
@@ -707,103 +666,7 @@ No cargo
 
 </div>
 
-<div class="box">
-
-<h4>Latest Events</h4>
-
-<div class="event">
-
-<h5>LoadGame</h5>
-
-<p>
-<b>Commander:</b>
-${loadGame.Commander ?? "-"}
-</p>
-
-<p>
-<b>Ship:</b>
-${loadGame.Ship_Localised ?? "-"}
-</p>
-
-<p>
-<b>Fuel:</b>
-${loadGame.FuelLevel ?? 0}
-/
-${loadGame.FuelCapacity ?? 0}
-</p>
-
-<p>
-<b>Timestamp:</b>
-${loadGame.timestamp ?? "-"}
-</p>
-
-</div>
-
-<div class="event">
-
-<h5>Loadout</h5>
-
-<p>
-<b>Ship ID:</b>
-${loadout.ShipIdent ?? "-"}
-</p>
-
-<p>
-<b>Hull Value:</b>
-${Number(
-loadout.HullValue || 0
-).toLocaleString()}
-</p>
-
-<p>
-<b>Modules Value:</b>
-${Number(
-loadout.ModulesValue || 0
-).toLocaleString()}
-</p>
-
-<p>
-<b>Cargo Capacity:</b>
-${loadout.CargoCapacity ?? 0}
-</p>
-
-<p>
-<b>Jump Range:</b>
-${loadout.MaxJumpRange ?? 0}
-</p>
-
-<p>
-<b>Timestamp:</b>
-${loadout.timestamp ?? "-"}
-</p>
-
-</div>
-
-<div class="event">
-
-<h5>Cargo</h5>
-
-<p>
-<b>Vessel:</b>
-${cargoEvent.Vessel ?? "-"}
-</p>
-
-<p>
-<b>Count:</b>
-${cargoEvent.Count ?? 0}
-</p>
-
-<p>
-<b>Timestamp:</b>
-${cargoEvent.timestamp ?? "-"}
-</p>
-
-</div>
-
-</div>
-
 `;
-
 }
 
 // =========================
